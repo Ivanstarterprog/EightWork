@@ -22,9 +22,17 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 
 class MainActivity : AppCompatActivity() {
+    private val DATA_KEY = "DATA_KEY"
+    private var WeatherStore = object {
+        lateinit var list: DataResponce
+    }
+    private lateinit var dataResponce: DataResponce
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setSupportActionBar(findViewById(R.id.toolbar))
+        getSupportActionBar()?.setTitle("Shklov")
 
         val rView: RecyclerView = findViewById<RecyclerView>(R.id.r_view)
         rView.layoutManager = LinearLayoutManager(this)
@@ -34,21 +42,48 @@ class MainActivity : AppCompatActivity() {
             throwable.printStackTrace()
         }
 
-        GlobalScope.launch(Dispatchers.IO + coroutineExceptionHandler){
-            val days = daysApi.check()
+        if(savedInstanceState == null){
+            Log.d("SavedInstace", "Первый запуск")
 
-            withContext(Dispatchers.Main){
-                if(days.body() != null){
-                    Log.d("Days go by", days.body().toString())
-                    val adapter : DayListAdapter = DayListAdapter()
-                    adapter.submitList(days.body()?.list?.toMutableList())
-                    rView.adapter = adapter
+            GlobalScope.launch(Dispatchers.IO + coroutineExceptionHandler){
+                val days = daysApi.check()
+
+                withContext(Dispatchers.Main){
+                    if(days.body() != null){
+                        dataResponce = days.body()!!
+                        WeatherStore.list = days.body()!!
+                        Log.d("Days go by", days.body().toString())
+                        Log.d("Object data", WeatherStore.toString())
+                        val adapter : DayListAdapter = DayListAdapter()
+
+                        adapter.submitList(dataResponce.list.toMutableList())
+                        rView.adapter = adapter
+                    }
                 }
             }
         }
+        else {
+            Log.d("SavedInstace", "Не первый запуск")
+            val jsonText = savedInstanceState.getString(DATA_KEY)
+            var gson = Gson()
+            dataResponce = gson.fromJson(jsonText, DataResponce::class.java)
+            val adapter : DayListAdapter = DayListAdapter()
+            adapter.submitList(dataResponce.list.toMutableList())
+            rView.adapter = adapter
+        }
+
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        val gson = Gson()
+        val jsonText = gson.toJson(dataResponce)
+        outState.putString(DATA_KEY, jsonText)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.toolbar, menu)
 
         return true
     }
