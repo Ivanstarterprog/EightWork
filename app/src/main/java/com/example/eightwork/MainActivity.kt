@@ -23,9 +23,6 @@ import retrofit2.http.GET
 
 class MainActivity : AppCompatActivity() {
     private val DATA_KEY = "DATA_KEY"
-    private var WeatherStore = object {
-        lateinit var list: DataResponce
-    }
     private lateinit var dataResponce: DataResponce
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,11 +48,8 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main){
                     if(days.body() != null){
                         dataResponce = days.body()!!
-                        WeatherStore.list = days.body()!!
                         Log.d("Days go by", days.body().toString())
-                        Log.d("Object data", WeatherStore.toString())
                         val adapter : DayListAdapter = DayListAdapter()
-
                         adapter.submitList(dataResponce.list.toMutableList())
                         rView.adapter = adapter
                     }
@@ -71,21 +65,6 @@ class MainActivity : AppCompatActivity() {
             adapter.submitList(dataResponce.list.toMutableList())
             rView.adapter = adapter
         }
-
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        val gson = Gson()
-        val jsonText = gson.toJson(dataResponce)
-        outState.putString(DATA_KEY, jsonText)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.toolbar, menu)
-
-        return true
     }
 }
 
