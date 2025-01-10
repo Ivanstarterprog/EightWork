@@ -4,18 +4,16 @@ package com.example.eightwork
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -29,10 +27,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(findViewById(R.id.toolbar))
-        getSupportActionBar()?.setTitle("Shklov")
+        supportActionBar?.setTitle("Shklov")
 
-        val rView: RecyclerView = findViewById<RecyclerView>(R.id.r_view)
-        rView.layoutManager = LinearLayoutManager(this)
+        val recyclerView: RecyclerView = findViewById<RecyclerView>(R.id.r_view)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.addItemDecoration(DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         val daysApi = RetrofitHelper.getInstance().create(DayGetter::class.java)
 
         val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
@@ -40,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         if(savedInstanceState == null){
-            Log.d("SavedInstace", "Первый запуск")
 
             GlobalScope.launch(Dispatchers.IO + coroutineExceptionHandler){
                 val days = daysApi.check()
@@ -48,24 +46,33 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main){
                     if(days.body() != null){
                         dataResponce = days.body()!!
-                        Log.d("Days go by", days.body().toString())
-                        val adapter : DayListAdapter = DayListAdapter()
+                        Log.i("Запрос", days.body().toString())
+                        val adapter = DayListAdapter()
                         adapter.submitList(dataResponce.list.toMutableList())
-                        rView.adapter = adapter
+                        recyclerView.adapter = adapter
                     }
                 }
             }
         }
         else {
-            Log.d("SavedInstace", "Не первый запуск")
             val jsonText = savedInstanceState.getString(DATA_KEY)
             var gson = Gson()
             dataResponce = gson.fromJson(jsonText, DataResponce::class.java)
-            val adapter : DayListAdapter = DayListAdapter()
+            val adapter = DayListAdapter()
             adapter.submitList(dataResponce.list.toMutableList())
-            rView.adapter = adapter
+            recyclerView.adapter = adapter
+            Log.i("savedInstanceState", dataResponce.toString())
         }
     }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        val gson = Gson()
+        val jsonText = gson.toJson(dataResponce)
+        outState.putString(DATA_KEY, jsonText)
+
+    }
+
 }
 
 interface DayGetter {

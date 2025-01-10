@@ -2,10 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp"
+    android:padding="5dp"
     android:background="@color/hot"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
+        android:textColor="@color/gray"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         android:id="@+id/datetime"
@@ -14,6 +16,7 @@
     </TextView>
 
     <TextView
+        android:textColor="@color/gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toLeftOf="@id/icon"
         android:id="@+id/txt_minus_temperature"
@@ -29,19 +32,12 @@
         android:contentDescription="" />
 
     <TextView
+        android:textColor="@color/gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:id="@+id/txt_plus_temperature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="50dp"/>
-
-    <com.google.android.material.divider.MaterialDivider
-        app:dividerColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    </com.google.android.material.divider.MaterialDivider>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

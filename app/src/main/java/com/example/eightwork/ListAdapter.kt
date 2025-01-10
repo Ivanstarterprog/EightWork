@@ -72,7 +72,6 @@ class DayListAdapter() : ListAdapter<DayPrognosis, ViewHolder>(DayDiffCallback()
     override fun getItemCount() = currentList.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val day = currentList[position]
         if(holder.itemViewType == VIEW_TYPE_HOT){
             (holder as DayViewHolderHot).bind(position)
         }
