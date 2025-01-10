@@ -21,6 +21,9 @@ import retrofit2.http.GET
 
 class MainActivity : AppCompatActivity() {
     private val DATA_KEY = "DATA_KEY"
+    private var WeatherStore = object {
+        lateinit var weatherData: DataResponce
+    }
     private lateinit var dataResponce: DataResponce
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +49,9 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main){
                     if(days.body() != null){
                         dataResponce = days.body()!!
+                        WeatherStore.weatherData = days.body()!!
                         Log.i("Запрос", days.body().toString())
+                        Log.d("Из объекта", WeatherStore.toString())
                         val adapter = DayListAdapter()
                         adapter.submitList(dataResponce.list.toMutableList())
                         recyclerView.adapter = adapter
